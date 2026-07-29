@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "sdk_version": "0.25.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://njvmuwkzzcfeaigqfwee.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "bella-ia-mcp",
+      "version": "0.1.0",
+      "title": "Bella IA — Esthetic Center"
+    },
+    "tools": [
+      {
+        "name": "whoami",
+        "title": "Identidade do usuário conectado",
+        "description": "Retorna o usuário da Bella IA autenticado nesta conexão (id e e-mail). Útil para confirmar o vínculo da integração.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_modules",
+        "title": "Listar módulos da plataforma",
+        "description": "Lista os módulos do workspace administrativo da Bella IA, com rota e descrição de cada um.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_dashboard_metrics",
+        "title": "Métricas do dashboard",
+        "description": "Lê as métricas operacionais da Bella IA (pacientes, atendimentos do mês, protocolos ativos e profissionais ativos) direto do banco, como o usuário conectado. Retorna null quando a fonte ainda não existe no schema.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
