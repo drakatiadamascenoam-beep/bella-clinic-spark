@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,11 +23,11 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { signIn, signUp, isAuthenticated } = useAuth();
+  const { signIn, resetPassword, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const search = useSearch({ from: "/auth" }) as { redirect?: string };
   const [isLoading, setIsLoading] = React.useState(false);
-  const [mode, setMode] = React.useState<"signin" | "signup">("signin");
+  const [mode, setMode] = React.useState<"signin" | "recover">("signin");
 
   React.useEffect(() => {
     if (isAuthenticated) {
@@ -49,9 +49,10 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Login realizado com sucesso");
       } else {
-        const { error } = await signUp(email, password);
+        const { error } = await resetPassword(email);
         if (error) throw error;
-        toast.success("Cadastro realizado. Verifique seu e-mail para confirmar.");
+        toast.success("Enviamos um link de redefinição para o seu e-mail.");
+        setMode("signin");
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro na autenticação");
@@ -76,12 +77,12 @@ function AuthPage() {
         <Card className="border-border/60 bg-card shadow-soft">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="font-serif text-2xl font-medium">
-              {mode === "signin" ? "Bem-vinda de volta" : "Criar conta"}
+              {mode === "signin" ? "Bem-vinda de volta" : "Recuperar senha"}
             </CardTitle>
             <CardDescription>
               {mode === "signin"
                 ? "Entre com suas credenciais para acessar a plataforma."
-                : "Preencha os dados abaixo para solicitar acesso."}
+                : "Informe seu e-mail para receber o link de redefinição."}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -97,36 +98,52 @@ function AuthPage() {
                   className="rounded-lg"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  minLength={6}
-                  className="rounded-lg"
-                />
-              </div>
+              {mode === "signin" && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Senha</Label>
+                    <button
+                      type="button"
+                      onClick={() => setMode("recover")}
+                      className="text-xs font-medium text-marsala hover:underline"
+                    >
+                      Esqueci minha senha
+                    </button>
+                  </div>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    className="rounded-lg"
+                  />
+                </div>
+              )}
               <Button
                 type="submit"
                 className="w-full rounded-lg bg-marsala text-marsala-foreground hover:bg-marsala-medium"
                 disabled={isLoading}
               >
-                {isLoading ? "Aguarde..." : mode === "signin" ? "Entrar" : "Criar conta"}
+                {isLoading ? "Aguarde..." : mode === "signin" ? "Entrar" : "Enviar link de redefinição"}
               </Button>
             </form>
 
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              {mode === "signin" ? "Ainda não tem acesso?" : "Já tem uma conta?"}{" "}
-              <button
-                type="button"
-                onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-                className="font-medium text-marsala hover:underline"
-              >
-                {mode === "signin" ? "Solicitar cadastro" : "Fazer login"}
-              </button>
+            {mode === "recover" && (
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                <button
+                  type="button"
+                  onClick={() => setMode("signin")}
+                  className="font-medium text-marsala hover:underline"
+                >
+                  Voltar para o login
+                </button>
+              </p>
+            )}
+
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              Primeiro acesso? Solicite credenciais à administração.
             </p>
           </CardContent>
         </Card>
