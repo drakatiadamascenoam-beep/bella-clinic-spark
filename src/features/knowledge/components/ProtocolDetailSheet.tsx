@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
+import { ProtocolActionsMenu } from "./ProtocolActionsMenu";
 import { ProtocolStatusBadge } from "./ProtocolStatusBadge";
 import { useProtocol } from "@/hooks/useProtocol";
 import type { Protocol } from "@/services/protocol.service";
@@ -55,16 +56,22 @@ export function ProtocolDetailSheet({
           {current && (
             <div className="flex items-center justify-between gap-3">
               <ProtocolStatusBadge status={current.status} className="w-fit" />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => onEdit(current)}
-                className="focus-visible:ring-2 focus-visible:ring-marsala"
-              >
-                <Pencil className="mr-2 h-4 w-4" aria-hidden="true" />
-                Editar
-              </Button>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  Versão vigente: {current.version ?? "não informada"}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEdit(current)}
+                  className="focus-visible:ring-2 focus-visible:ring-marsala"
+                >
+                  <Pencil className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Editar
+                </Button>
+                <ProtocolActionsMenu protocol={current} onEdit={onEdit} />
+              </div>
             </div>
           )}
         </SheetHeader>
@@ -86,6 +93,16 @@ export function ProtocolDetailSheet({
             <Field label="Indicações" value={current.indications} />
             <Field label="Contraindicações" value={current.contraindications} />
             <Field label="Última atualização" value={current.updatedAt} />
+
+            <div className="rounded-xl border border-dashed border-border p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                Histórico de versões
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                O schema atual do Bella Knowledge Graph v3.0 não expõe histórico de versões. Esta
+                área será preenchida automaticamente quando a fonte estiver disponível.
+              </p>
+            </div>
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">

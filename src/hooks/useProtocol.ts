@@ -2,14 +2,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   createProtocol,
+  createProtocolVersion,
+  duplicateProtocol,
+  updateProtocolStatus,
   getProtocolById,
   listProtocols,
   updateProtocol,
   type Protocol,
   type ProtocolFiltersInput,
   type ProtocolListResult,
+  type ProtocolVersionResult,
 } from "@/services/protocol.service";
 import type { ProtocolFormValues } from "@/features/knowledge/types/protocol-form";
+import type {
+  ProtocolLifecycleStatus,
+  ProtocolVersionType,
+} from "@/features/knowledge/types/protocol-lifecycle";
 
 /**
  * Única porta de entrada de dados de Protocolos Mestres.
@@ -65,6 +73,49 @@ export function useUpdateProtocol() {
   return useMutation<Protocol, Error, ProtocolFormValues & { id: string }>({
     mutationFn: (values) => update({ data: values }),
     onSuccess: (protocol) => {
+      queryClient.invalidateQueries({ queryKey: protocolKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: protocolKeys.detail(protocol.id) });
+    },
+  });
+}
+
+export function useUpdateProtocolStatus() {
+  const queryClient = useQueryClient();
+  const mutate = useServerFn(updateProtocolStatus);
+
+  return useMutation<Protocol, Error, { id: string; status: ProtocolLifecycleStatus }>({
+    mutationFn: (input) => mutate({ data: input }),
+    onSuccess: (protocol) => {
+      queryClient.invalidateQueries({ queryKey: protocolKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: protocolKeys.detail(protocol.id) });
+    },
+  });
+}
+
+export function useDuplicateProtocol() {
+  const queryClient = useQueryClient();
+  const mutate = useServerFn(duplicateProtocol);
+
+  return useMutation<Protocol, Error, { id: string; name: string | null; code: string | null }>({
+    mutationFn: (input) => mutate({ data: input }),
+    onSuccess: (protocol) => {
+      queryClient.invalidateQueries({ queryKey: protocolKeys.lists() });
+      queryClient.setQueryData(protocolKeys.detail(protocol.id), protocol);
+    },
+  });
+}
+
+export function useCreateProtocolVersion() {
+  const queryClient = useQueryClient();
+  const mutate = useServerFn(createProtocolVersion);
+
+  return useMutation<
+    ProtocolVersionResult,
+    Error,
+    { id: string; versionType: ProtocolVersionType; changes: string }
+  >({
+    mutationFn: (input) => mutate({ data: input }),
+    onSuccess: ({ protocol }) => {
       queryClient.invalidateQueries({ queryKey: protocolKeys.lists() });
       queryClient.invalidateQueries({ queryKey: protocolKeys.detail(protocol.id) });
     },

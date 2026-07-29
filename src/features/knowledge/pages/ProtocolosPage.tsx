@@ -92,6 +92,7 @@ export function ProtocolosPage() {
         isLoading={isPending}
         sourceUnavailable={data?.sourceUnavailable ?? false}
         onSelect={setSelected}
+        onEdit={openEdit}
       />
 
       {total > PROTOCOL_PAGE_SIZE && (
