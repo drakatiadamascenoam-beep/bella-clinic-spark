@@ -1,107 +1,37 @@
-# Sprint 0.9 — Infraestrutura técnica da Bella Clinic Platform
+## Sprint 1.1 — Consolidação Arquitetural
 
-## Objetivo
-Entregar a base técnica da plataforma sem nenhuma funcionalidade de negócio. Ao final, o projeto deve compilar, ter autenticação Supabase funcional, design system da Esthetic Center aplicado, camada de serviços tipada e um layout shell vazio (sidebar + header + área principal).
+Criação apenas de documentação e scaffolding. Nenhum arquivo existente é movido, alterado ou removido; nenhuma mudança em banco, tipos ou conexões.
 
-## Premissas
-- Stack: React 19 + TypeScript + TanStack Start + TanStack Query v5 + Tailwind CSS v4 + shadcn/ui.
-- Backend: Lovable Cloud (Supabase) será a única fonte de verdade.
-- O schema Bella Knowledge Graph v3.0 já existe no Supabase; não criarei migrations nem alterarei tabelas.
-- Nenhum dado mockado ou hardcoded será utilizado.
-- Perfis iniciais: ADMIN, PROFISSIONAL, RECEPCAO. A estrutura de RBAC será preparada, mas as regras detalhadas virão em sprints futuras.
-- Identidade visual: Quiet Luxury, paleta Marsala/Gold/Creme/Marfim, fontes Cormorant Garamond + Inter.
+### 1. Governança técnica — `/docs/adr` (raiz, fora de `/src`)
 
-## Etapas
+Quatro ADRs em Markdown, cada um com as seções **Contexto**, **Decisão**, **Justificativa** e **Consequências**:
 
-### 1. Habilitar Lovable Cloud
-- Ativar a integração Lovable Cloud no projeto para obter URL e chaves do Supabase.
-- Configurar as variáveis de ambiente necessárias (cliente e servidor).
+- `docs/adr/ADR-001-database-first.md` — Supabase como Single Source of Truth; congelamento do Bella Knowledge Graph v3.0; proibição de mocks e de alterações de schema pelo frontend.
+- `docs/adr/ADR-002-authentication.md` — autenticação corporativa (credenciais emitidas pela administração), remoção do cadastro público, recuperação de senha, rotas protegidas pelo layout `_authenticated`.
+- `docs/adr/ADR-003-dashboard.md` — métricas unificadas por custom hooks (`useDashboard`) sobre a camada de serviços; UI desacoplada (KpiCard, tabela, skeleton, empty state) sem acesso direto ao backend.
+- `docs/adr/ADR-004-feature-based-architecture.md` — organização por domínios em `/src/features`; fronteira entre features e `/src/components/shared`, `/src/services`, `/src/routes`.
 
-### 2. Estrutura oficial de pastas
-Criar a organização base:
+Também adiciono `docs/adr/README.md` como índice curto dos ADRs (opcional, ajuda navegação).
 
-```
-src/
-  components/
-    ui/              # primitives shadcn/ui customizados
-    layout/          # AppSidebar, AppHeader, AppShell
-  hooks/
-    use-auth.ts      # acesso ao contexto de autenticação
-    use-mobile.tsx   # já existe
-  integrations/
-    supabase/
-      client.ts      # cliente browser
-      auth-middleware.ts  # requireSupabaseAuth
-      auth-attacher.ts    # anexar bearer token
-      types.ts       # tipos Database gerados
-  lib/
-    utils.ts         # já existe (cn, etc.)
-  routes/
-    __root.tsx       # root com providers e layout global
-    index.tsx        # landing pública
-    auth.tsx         # login/cadastro
-    _authenticated/
-      route.tsx      # layout protegido (integração gerenciada)
-      dashboard.tsx  # página vazia do shell
-  services/
-    auth.service.ts  # login, logout, recuperação de senha
-    users.service.ts # perfil e roles
-  styles.css         # design system
+### 2. Scaffolding de domínios — `/src/features`
+
+Sete domínios, cada um com as subpastas `components`, `hooks`, `services`, `pages`, `types` e um `README.md` descrevendo a responsabilidade do domínio, o que pertence e o que não pertence a ele:
+
+```text
+src/features/
+  knowledge/      { components, hooks, services, pages, types } + README.md
+  patients/       ...
+  attendance/     ...
+  professionals/  ...
+  agenda/         ...
+  dashboard/      ...
+  settings/       ...
 ```
 
-### 3. Design System — Quiet Luxury
-- Atualizar `src/styles.css` com tokens semânticos oklch baseados na paleta oficial:
-  - Marsala `#5C1F2E`
-  - Marsala Médio `#7A2D3E`
-  - Gold `#B08D6A`
-  - Creme `#FAF8F5`
-  - Marfim `#F4F1ED`
-- Configurar `border-radius` para `rounded-xl` / `rounded-2xl`.
-- Adicionar sombras suaves e espaçamento generoso.
-- Carregar fontes Cormorant Garamond e Inter via `<link>` no `head()` do `__root.tsx`.
-- Customizar componentes shadcn (Button, Card, Input, Sidebar) para refletir a identidade premium.
+Detalhe técnico: Git não versiona pastas vazias, então cada subpasta recebe um `.gitkeep` para que a estrutura persista. Nenhum arquivo `.ts`/`.tsx` é criado — assim nada entra no grafo de build nem em `routeTree.gen.ts`.
 
-### 4. Supabase Client e Auth
-- Criar cliente browser em `src/integrations/supabase/client.ts`.
-- Criar middleware de autenticação `requireSupabaseAuth` para server functions.
-- Criar `auth-attacher.ts` para anexar bearer token nas chamadas client-side.
-- Gerar tipos TypeScript a partir do schema existente (`Database` types).
-- Configurar `src/start.ts` para incluir o `attachSupabaseAuth` no `functionMiddleware`.
+### 3. Validação
 
-### 5. AuthProvider e QueryProvider
-- Criar `AuthProvider` com contexto de sessão, signIn, signOut, signUp, resetPassword.
-- Integrar `onAuthStateChange` no `__root.tsx` para invalidar router/query em mudanças de sessão.
-- Manter `QueryClientProvider` já existente.
-- Criar rotas públicas (`/`, `/auth`) e protegidas (`/_authenticated/*`).
+Build de produção executado ao final para confirmar ausência de erros (esperado: nenhum impacto, já que nada executável foi adicionado).
 
-### 6. Camada de serviços (/services)
-- Criar estrutura inicial desacoplada da UI:
-  - `auth.service.ts`: funções de autenticação.
-  - `users.service.ts`: leitura de perfil/roles (server functions autenticadas).
-- Todas as funções tipadas com Zod + TypeScript.
-- Nenhuma lógica de negócio clínica será implementada.
-
-### 7. Layout Shell vazio
-- Criar `AppSidebar` com navegação placeholder (sem funcionalidades reais).
-- Criar `AppHeader` com trigger do sidebar e área de usuário.
-- Criar `AppShell` combinando sidebar + header + `<Outlet />`.
-- Aplicar na rota autenticada (`/_authenticated/dashboard`).
-- Garantir responsividade desktop-first e mini-sidebar colapsável.
-
-### 8. Validação e build
-- Executar `bun run build` para confirmar que o projeto compila sem erros.
-- Verificar que não há imports proibidos (ex: `client.server` no cliente).
-- Apresentar a estrutura de arquivos final e dependências instaladas.
-
-## Critérios de aceitação
-- [ ] Lovable Cloud ativado e variáveis de ambiente configuradas.
-- [ ] Tipos `Database` do Supabase gerados e importáveis.
-- [ ] Login com email/senha funcional (sem funcionalidades clínicas).
-- [ ] Rotas autenticadas redirecionam para `/auth` quando não logado.
-- [ ] Layout shell renderiza sidebar, header e área principal vazia.
-- [ ] Design system com paleta e tipografia da Esthetic Center aplicados.
-- [ ] `bun run build` executa sem erros.
-- [ ] Nenhum dado mockado ou hardcoded foi adicionado.
-
-## Pergunta para confirmação antes de iniciar
-O schema Bella Knowledge Graph v3.0 já inclui as tabelas `profiles` e `user_roles` (ou equivalente) para suportar o RBAC? Caso contrário, precisarei que você forneça as migrations correspondentes, pois não podemos criar/modificar tabelas sem sua aprovação.
+Sprint 2 não é iniciada; aguardo aprovação no Gate.
