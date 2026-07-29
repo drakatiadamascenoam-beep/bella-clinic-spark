@@ -1,3 +1,4 @@
+import type React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ClipboardList } from "lucide-react";
 
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/conhecimento/")({
   component: ConhecimentoIndexPage,
 });
 
-function ConhecimentoIndexPage() {
+function ConhecimentoIndexPage(): React.ReactElement {
   return (
     <div className="flex flex-col gap-6">
       <header>
