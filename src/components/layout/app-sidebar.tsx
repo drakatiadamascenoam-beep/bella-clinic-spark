@@ -84,7 +84,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup defaultOpen>
+        <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/50">Administração</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
