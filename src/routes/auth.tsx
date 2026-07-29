@@ -93,19 +93,19 @@ function AuthPage() {
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder="Digite seu e-mail"
                   required
-                  className="rounded-lg"
+                  className="rounded-lg focus-visible:ring-marsala"
                 />
               </div>
               {mode === "signin" && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <Label htmlFor="password">Senha</Label>
                     <button
                       type="button"
                       onClick={() => setMode("recover")}
-                      className="text-xs font-medium text-marsala hover:underline"
+                      className="py-1.5 text-xs font-medium text-marsala hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-marsala focus-visible:ring-offset-2"
                     >
                       Esqueci minha senha
                     </button>
@@ -117,13 +117,13 @@ function AuthPage() {
                     placeholder="••••••••"
                     required
                     minLength={6}
-                    className="rounded-lg"
+                    className="rounded-lg focus-visible:ring-marsala"
                   />
                 </div>
               )}
               <Button
                 type="submit"
-                className="w-full rounded-lg bg-marsala text-marsala-foreground hover:bg-marsala-medium"
+                className="w-full rounded-lg bg-marsala text-marsala-foreground hover:bg-marsala-medium focus-visible:ring-marsala"
                 disabled={isLoading}
               >
                 {isLoading ? "Aguarde..." : mode === "signin" ? "Entrar" : "Enviar link de redefinição"}
