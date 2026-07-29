@@ -7,13 +7,15 @@ import { z } from "zod";
 
 export const PROTOCOL_FORM_STATUS = ["active", "draft", "archived"] as const;
 
+/** Campo textual opcional: string vazia representa ausência de valor. */
 const optionalText = (max: number) =>
-  z
-    .string()
-    .trim()
-    .max(max, `Máximo de ${max} caracteres.`)
-    .optional()
-    .transform((value) => value ?? "");
+  z.string().trim().max(max, `Máximo de ${max} caracteres.`);
+
+export const PROTOCOL_STATUS_LABELS: Record<(typeof PROTOCOL_FORM_STATUS)[number], string> = {
+  active: "Ativo",
+  draft: "Rascunho",
+  archived: "Arquivado",
+};
 
 export const protocolFormSchema = z.object({
   name: z
