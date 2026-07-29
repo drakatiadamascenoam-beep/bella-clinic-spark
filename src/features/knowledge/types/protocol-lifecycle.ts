@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { ProtocolStatus } from "@/services/protocol.service";
 import { PROTOCOL_STATUS_LABELS } from "./protocol-form";
 
@@ -105,3 +106,29 @@ export function suggestDuplicateCode(code: string | null): string {
   if (!code) return "";
   return `${code}-COPIA`.slice(0, 40);
 }
+
+/* -------------------------------------------------------------------------- */
+/* Schemas dos formulários de ciclo de vida                                    */
+/* -------------------------------------------------------------------------- */
+
+export const protocolDuplicateSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Informe ao menos 3 caracteres.")
+    .max(160, "Máximo de 160 caracteres."),
+  code: z.string().trim().max(40, "Máximo de 40 caracteres."),
+});
+
+export type ProtocolDuplicateValues = z.infer<typeof protocolDuplicateSchema>;
+
+export const protocolVersionSchema = z.object({
+  versionType: z.enum(PROTOCOL_VERSION_TYPES, { message: "Selecione o tipo de versão." }),
+  changes: z
+    .string()
+    .trim()
+    .min(10, "Descreva as alterações com pelo menos 10 caracteres.")
+    .max(2000, "Máximo de 2000 caracteres."),
+});
+
+export type ProtocolVersionValues = z.infer<typeof protocolVersionSchema>;
