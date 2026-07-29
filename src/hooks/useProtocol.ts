@@ -1,12 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  createProtocol,
   getProtocolById,
   listProtocols,
+  updateProtocol,
   type Protocol,
   type ProtocolFiltersInput,
   type ProtocolListResult,
 } from "@/services/protocol.service";
+import type { ProtocolFormValues } from "@/features/knowledge/types/protocol-form";
 
 /**
  * Única porta de entrada de dados de Protocolos Mestres.
@@ -15,9 +18,11 @@ import {
 
 export const protocolKeys = {
   all: ["protocols"] as const,
+  lists: () => ["protocols", "list"] as const,
   list: (filters: ProtocolFiltersInput) => ["protocols", "list", filters] as const,
   detail: (id: string) => ["protocols", "detail", id] as const,
 };
+
 
 export function useProtocols(filters: ProtocolFiltersInput) {
   const fetchProtocols = useServerFn(listProtocols);
