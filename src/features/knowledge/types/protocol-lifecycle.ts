@@ -30,15 +30,15 @@ export function canTransition(from: ProtocolStatus, to: ProtocolLifecycleStatus)
   return TRANSITIONS[from].includes(to);
 }
 
+export function statusLabel(status: ProtocolStatus): string {
+  return status === "unknown" ? "Não classificado" : PROTOCOL_STATUS_LABELS[status];
+}
+
 export function transitionErrorMessage(
   from: ProtocolStatus,
   to: ProtocolLifecycleStatus,
 ): string {
-  return `Transição inválida: ${PROTOCOL_STATUS_LABELS_SAFE(from)} → ${PROTOCOL_STATUS_LABELS[to]}.`;
-}
-
-function PROTOCOL_STATUS_LABELS_SAFE(status: ProtocolStatus): string {
-  return status === "unknown" ? "Não classificado" : PROTOCOL_STATUS_LABELS[status];
+  return `Transição inválida: ${statusLabel(from)} → ${PROTOCOL_STATUS_LABELS[to]}.`;
 }
 
 export interface ProtocolStatusAction {
