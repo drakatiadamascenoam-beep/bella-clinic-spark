@@ -34,11 +34,15 @@ const roleSchema = z.enum(["ADMIN", "PROFISSIONAL", "RECEPCAO"]);
 export const getCurrentUserProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("profiles" as any)
-      .select("*")
-      .eq("id", context.userId)
-      .maybeSingle();
+    const supabase = context.supabase as unknown as {
+      from(table: "profiles"): {
+        select(columns: "*"): {
+          eq(column: "id", value: string): { maybeSingle(): Promise<{ data: unknown; error: unknown }> };
+        };
+      };
+    };
+
+    const { data, error } = await supabase.from("profiles").select("*").eq("id", context.userId).maybeSingle();
 
     if (error) throw error;
     return (data ?? null) as ProfileRow | null;
@@ -47,10 +51,15 @@ export const getCurrentUserProfile = createServerFn({ method: "GET" })
 export const getCurrentUserRoles = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("user_roles" as any)
-      .select("role")
-      .eq("user_id", context.userId);
+    const supabase = context.supabase as unknown as {
+      from(table: "user_roles"): {
+        select(columns: "role"): {
+          eq(column: "user_id", value: string): Promise<{ data: unknown; error: unknown }>;
+        };
+      };
+    };
+
+    const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", context.userId);
 
     if (error) throw error;
     return ((data as UserRoleRow[] | null)?.map((r) => r.role) ?? []) as AppRole[];
