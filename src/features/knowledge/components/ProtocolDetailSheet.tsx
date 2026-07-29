@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 import { ProtocolStatusBadge } from "./ProtocolStatusBadge";
 import { useProtocol } from "@/hooks/useProtocol";
 import type { Protocol } from "@/services/protocol.service";
@@ -15,6 +17,7 @@ export interface ProtocolDetailSheetProps {
   protocol: Protocol | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onEdit: (protocol: Protocol) => void;
 }
 
 function Field({ label, value }: { label: string; value: string | null }) {
@@ -32,6 +35,7 @@ export function ProtocolDetailSheet({
   protocol,
   open,
   onOpenChange,
+  onEdit,
 }: ProtocolDetailSheetProps) {
   const { data, isFetching } = useProtocol(open && protocol ? protocol.id : null);
   const current = data ?? protocol;
@@ -48,7 +52,21 @@ export function ProtocolDetailSheet({
               ? `Código ${current.code}`
               : "Detalhes do protocolo mestre registrado no Bella Knowledge Graph."}
           </SheetDescription>
-          {current && <ProtocolStatusBadge status={current.status} className="w-fit" />}
+          {current && (
+            <div className="flex items-center justify-between gap-3">
+              <ProtocolStatusBadge status={current.status} className="w-fit" />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(current)}
+                className="focus-visible:ring-2 focus-visible:ring-marsala"
+              >
+                <Pencil className="mr-2 h-4 w-4" aria-hidden="true" />
+                Editar
+              </Button>
+            </div>
+          )}
         </SheetHeader>
 
         <Separator className="my-5" />

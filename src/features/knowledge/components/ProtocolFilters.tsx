@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { ProtocolStatus } from "@/services/protocol.service";
+import { PROTOCOL_FORM_STATUS, PROTOCOL_STATUS_LABELS } from "../types/protocol-form";
 
 export interface ProtocolFiltersValue {
   search: string;
@@ -25,9 +26,10 @@ export interface ProtocolFiltersProps {
 
 const STATUS_OPTIONS: Array<{ value: ProtocolStatus | "all"; label: string }> = [
   { value: "all", label: "Todos os status" },
-  { value: "active", label: "Ativo" },
-  { value: "draft", label: "Rascunho" },
-  { value: "archived", label: "Arquivado" },
+  ...PROTOCOL_FORM_STATUS.map((status) => ({
+    value: status satisfies ProtocolStatus,
+    label: PROTOCOL_STATUS_LABELS[status],
+  })),
 ];
 
 export function ProtocolFilters({
