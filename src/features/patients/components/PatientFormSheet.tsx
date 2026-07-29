@@ -12,25 +12,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 
 import { useCreatePaciente, usePaciente, useUpdatePaciente } from "../hooks/usePatient";
@@ -44,6 +28,7 @@ import {
   type PatientFormData,
 } from "../types/patient-form.types";
 import { toDateInputValue } from "./patient-format";
+import { PatientFormFields } from "./PatientFormFields";
 
 export interface PatientFormSheetProps {
   /** null → modo criação; Patient → modo edição. */
@@ -51,8 +36,6 @@ export interface PatientFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const SEXO_ITEMS = Object.entries(PATIENT_SEXO_LABELS);
 
 function toFormValues(patient: Patient): PatientFormData {
   const sexo = patient.sexo?.toLowerCase() ?? "";
@@ -150,167 +133,7 @@ export function PatientFormSheet({ patient, open, onOpenChange }: PatientFormShe
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-1 flex-col gap-4">
-              <FormField
-                control={form.control}
-                name="nome"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome completo</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Digite o nome completo"
-                        className="focus-visible:ring-2 focus-visible:ring-marsala"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="nome_social"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome social</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Opcional"
-                        className="focus-visible:ring-2 focus-visible:ring-marsala"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="cpf"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>CPF</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          inputMode="numeric"
-                          placeholder="000.000.000-00"
-                          onChange={(event) => field.onChange(maskCpf(event.target.value))}
-                          className="focus-visible:ring-2 focus-visible:ring-marsala"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="data_nascimento"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Data de nascimento</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="date"
-                          className="focus-visible:ring-2 focus-visible:ring-marsala"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="telefone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefone</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          inputMode="tel"
-                          placeholder="(00) 00000-0000"
-                          onChange={(event) => field.onChange(maskPhone(event.target.value))}
-                          className="focus-visible:ring-2 focus-visible:ring-marsala"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="sexo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sexo</FormLabel>
-                      <Select
-                        value={field.value.length > 0 ? field.value : undefined}
-                        onValueChange={field.onChange}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus-visible:ring-2 focus-visible:ring-marsala">
-                            <SelectValue placeholder="Selecione" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {SEXO_ITEMS.map(([value, label]) => (
-                            <SelectItem key={value} value={value}>
-                              {label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>E-mail</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="paciente@email.com"
-                        className="focus-visible:ring-2 focus-visible:ring-marsala"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="observacoes_alergias"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Alergias e observações técnicas</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        rows={4}
-                        placeholder="Registre alergias, restrições e observações clínicas relevantes"
-                        className="focus-visible:ring-2 focus-visible:ring-marsala"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <PatientFormFields control={form.control} />
 
               <SheetFooter className="mt-auto flex-row justify-end gap-2 pt-4">
                 <Button
