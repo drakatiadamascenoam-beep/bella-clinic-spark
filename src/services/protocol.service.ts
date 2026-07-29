@@ -69,6 +69,8 @@ interface QueryBuilder extends PromiseLike<QueryResult> {
   order(column: string, options: { ascending: boolean }): QueryBuilder;
   range(from: number, to: number): QueryBuilder;
   limit(count: number): QueryBuilder;
+  insert(values: ProtocolWritePayload): QueryBuilder;
+  update(values: ProtocolWritePayload): QueryBuilder;
   maybeSingle(): PromiseLike<QueryResult>;
 }
 
