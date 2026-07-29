@@ -44,3 +44,29 @@ export function useProtocol(id: string | null) {
     staleTime: 30_000,
   });
 }
+
+export function useCreateProtocol() {
+  const queryClient = useQueryClient();
+  const create = useServerFn(createProtocol);
+
+  return useMutation<Protocol, Error, ProtocolFormValues>({
+    mutationFn: (values) => create({ data: values }),
+    onSuccess: (protocol) => {
+      queryClient.invalidateQueries({ queryKey: protocolKeys.lists() });
+      queryClient.setQueryData(protocolKeys.detail(protocol.id), protocol);
+    },
+  });
+}
+
+export function useUpdateProtocol() {
+  const queryClient = useQueryClient();
+  const update = useServerFn(updateProtocol);
+
+  return useMutation<Protocol, Error, ProtocolFormValues & { id: string }>({
+    mutationFn: (values) => update({ data: values }),
+    onSuccess: (protocol) => {
+      queryClient.invalidateQueries({ queryKey: protocolKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: protocolKeys.detail(protocol.id) });
+    },
+  });
+}
