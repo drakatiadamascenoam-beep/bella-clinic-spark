@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProtocolStatusBadge } from "./ProtocolStatusBadge";
+import { ProtocolActionsMenu } from "./ProtocolActionsMenu";
 import type { Protocol } from "@/services/protocol.service";
 
 export interface ProtocolTableProps {
@@ -16,6 +17,7 @@ export interface ProtocolTableProps {
   isLoading?: boolean;
   sourceUnavailable?: boolean;
   onSelect: (protocol: Protocol) => void;
+  onEdit: (protocol: Protocol) => void;
 }
 
 function formatDate(value: string | null): string {
@@ -30,6 +32,7 @@ export function ProtocolTable({
   isLoading = false,
   sourceUnavailable = false,
   onSelect,
+  onEdit,
 }: ProtocolTableProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
@@ -41,6 +44,7 @@ export function ProtocolTable({
             <TableHead>Status</TableHead>
             <TableHead className="hidden lg:table-cell">Versão</TableHead>
             <TableHead className="hidden sm:table-cell text-right">Atualizado</TableHead>
+            <TableHead className="w-12 text-right sr-only">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -62,12 +66,15 @@ export function ProtocolTable({
                 <TableCell className="hidden sm:table-cell">
                   <Skeleton className="ml-auto h-4 w-20" />
                 </TableCell>
+                <TableCell>
+                  <Skeleton className="ml-auto h-8 w-8 rounded-md" />
+                </TableCell>
               </TableRow>
             ))}
 
           {!isLoading && protocols.length === 0 && (
             <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={5}>
+              <TableCell colSpan={6}>
                 <div className="flex flex-col items-center justify-center gap-2 py-14 text-center">
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
                     <FileText className="h-5 w-5" aria-hidden="true" />
@@ -120,6 +127,9 @@ export function ProtocolTable({
                 </TableCell>
                 <TableCell className="hidden sm:table-cell text-right text-muted-foreground">
                   {formatDate(protocol.updatedAt)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <ProtocolActionsMenu protocol={protocol} onEdit={onEdit} />
                 </TableCell>
               </TableRow>
             ))}
