@@ -23,6 +23,9 @@ import { Route as AuthenticatedAtendimentosRouteImport } from './routes/_authent
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as AuthenticatedConhecimentoRouteRouteImport } from './routes/_authenticated/conhecimento/route'
+import { Route as AuthenticatedConhecimentoIndexRouteImport } from './routes/_authenticated/conhecimento/index'
+import { Route as AuthenticatedConhecimentoProtocolosRouteImport } from './routes/_authenticated/conhecimento/protocolos'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
@@ -101,6 +104,24 @@ const Char91DotmcpChar93ListToolsRoute =
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedConhecimentoRouteRoute =
+  AuthenticatedConhecimentoRouteRouteImport.update({
+    id: '/conhecimento',
+    path: '/conhecimento',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConhecimentoIndexRoute =
+  AuthenticatedConhecimentoIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedConhecimentoRoute,
+  } as any)
+const AuthenticatedConhecimentoProtocolosRoute =
+  AuthenticatedConhecimentoProtocolosRouteImport.update({
+    id: '/protocolos',
+    path: '/protocolos',
+    getParentRoute: () => AuthenticatedConhecimentoRoute,
+  } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -118,34 +139,37 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/conhecimento': typeof AuthenticatedConhecimentoRouteWithChildren
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/atendimentos': typeof AuthenticatedAtendimentosRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
-  '/conhecimento': typeof AuthenticatedConhecimentoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/pacientes': typeof AuthenticatedPacientesRoute
   '/profissionais': typeof AuthenticatedProfissionaisRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/conhecimento/protocolos': typeof AuthenticatedConhecimentoProtocolosRoute
+  '/conhecimento/': typeof AuthenticatedConhecimentoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/conhecimento': typeof AuthenticatedConhecimentoIndexRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/atendimentos': typeof AuthenticatedAtendimentosRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
-  '/conhecimento': typeof AuthenticatedConhecimentoRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/pacientes': typeof AuthenticatedPacientesRoute
   '/profissionais': typeof AuthenticatedProfissionaisRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/conhecimento/protocolos': typeof AuthenticatedConhecimentoProtocolosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,17 +178,19 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/conhecimento': typeof AuthenticatedConhecimentoRouteWithChildren
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/atendimentos': typeof AuthenticatedAtendimentosRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
-  '/_authenticated/conhecimento': typeof AuthenticatedConhecimentoRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/pacientes': typeof AuthenticatedPacientesRoute
   '/_authenticated/profissionais': typeof AuthenticatedProfissionaisRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/_authenticated/conhecimento/protocolos': typeof AuthenticatedConhecimentoProtocolosRoute
+  '/_authenticated/conhecimento/': typeof AuthenticatedConhecimentoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -173,34 +199,37 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/reset-password'
+    | '/conhecimento'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/agenda'
     | '/atendimentos'
     | '/configuracoes'
-    | '/conhecimento'
     | '/dashboard'
     | '/pacientes'
     | '/profissionais'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/conhecimento/protocolos'
+    | '/conhecimento/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/mcp'
     | '/reset-password'
+    | '/conhecimento'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/agenda'
     | '/atendimentos'
     | '/configuracoes'
-    | '/conhecimento'
     | '/dashboard'
     | '/pacientes'
     | '/profissionais'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/conhecimento/protocolos'
   id:
     | '__root__'
     | '/'
@@ -208,17 +237,19 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/reset-password'
+    | '/_authenticated/conhecimento'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/agenda'
     | '/_authenticated/atendimentos'
     | '/_authenticated/configuracoes'
-    | '/_authenticated/conhecimento'
     | '/_authenticated/dashboard'
     | '/_authenticated/pacientes'
     | '/_authenticated/profissionais'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/_authenticated/conhecimento/protocolos'
+    | '/_authenticated/conhecimento/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -333,6 +364,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/conhecimento': {
+      id: '/_authenticated/conhecimento'
+      path: '/conhecimento'
+      fullPath: '/conhecimento'
+      preLoaderRoute: typeof AuthenticatedConhecimentoRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conhecimento/': {
+      id: '/_authenticated/conhecimento/'
+      path: '/'
+      fullPath: '/conhecimento/'
+      preLoaderRoute: typeof AuthenticatedConhecimentoIndexRouteImport
+      parentRoute: typeof AuthenticatedConhecimentoRoute
+    }
+    '/_authenticated/conhecimento/protocolos': {
+      id: '/_authenticated/conhecimento/protocolos'
+      path: '/protocolos'
+      fullPath: '/conhecimento/protocolos'
+      preLoaderRoute: typeof AuthenticatedConhecimentoProtocolosRouteImport
+      parentRoute: typeof AuthenticatedConhecimentoRoute
+    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -350,21 +402,40 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedConhecimentoRouteChildren {
+  AuthenticatedConhecimentoProtocolosRoute: typeof AuthenticatedConhecimentoProtocolosRoute
+  AuthenticatedConhecimentoIndexRoute: typeof AuthenticatedConhecimentoIndexRoute
+}
+
+const AuthenticatedConhecimentoRouteChildren: AuthenticatedConhecimentoRouteChildren =
+  {
+    AuthenticatedConhecimentoProtocolosRoute:
+      AuthenticatedConhecimentoProtocolosRoute,
+    AuthenticatedConhecimentoIndexRoute: AuthenticatedConhecimentoIndexRoute,
+  }
+
+const AuthenticatedConhecimentoRouteWithChildren =
+  AuthenticatedConhecimentoRoute._addFileChildren(
+    AuthenticatedConhecimentoRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedConhecimentoRouteRoute: typeof AuthenticatedConhecimentoRouteRoute
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
   AuthenticatedAtendimentosRoute: typeof AuthenticatedAtendimentosRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
-  AuthenticatedConhecimentoRoute: typeof AuthenticatedConhecimentoRoute
+  AuthenticatedConhecimentoRoute: typeof AuthenticatedConhecimentoRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPacientesRoute: typeof AuthenticatedPacientesRoute
   AuthenticatedProfissionaisRoute: typeof AuthenticatedProfissionaisRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedConhecimentoRouteRoute: AuthenticatedConhecimentoRouteRoute,
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
   AuthenticatedAtendimentosRoute: AuthenticatedAtendimentosRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
-  AuthenticatedConhecimentoRoute: AuthenticatedConhecimentoRoute,
+  AuthenticatedConhecimentoRoute: AuthenticatedConhecimentoRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPacientesRoute: AuthenticatedPacientesRoute,
   AuthenticatedProfissionaisRoute: AuthenticatedProfissionaisRoute,
