@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useProtocols } from "@/hooks/useProtocol";
@@ -7,6 +7,7 @@ import { PROTOCOL_PAGE_SIZE, type Protocol } from "@/services/protocol.service";
 import { ProtocolFilters, type ProtocolFiltersValue } from "../components/ProtocolFilters";
 import { ProtocolTable } from "../components/ProtocolTable";
 import { ProtocolDetailSheet } from "../components/ProtocolDetailSheet";
+import { ProtocolFormSheet } from "../components/ProtocolFormSheet";
 
 const INITIAL_FILTERS: ProtocolFiltersValue = {
   search: "",
@@ -18,12 +19,25 @@ export function ProtocolosPage() {
   const [filters, setFilters] = useState<ProtocolFiltersValue>(INITIAL_FILTERS);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Protocol | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<Protocol | null>(null);
 
   const query = useMemo(() => ({ ...filters, page }), [filters, page]);
   const { data, isPending, isError } = useProtocols(query);
 
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PROTOCOL_PAGE_SIZE));
+
+  function openCreate() {
+    setEditing(null);
+    setFormOpen(true);
+  }
+
+  function openEdit(protocol: Protocol) {
+    setSelected(null);
+    setEditing(protocol);
+    setFormOpen(true);
+  }
 
   function handleFiltersChange(next: ProtocolFiltersValue) {
     setFilters(next);
@@ -32,11 +46,21 @@ export function ProtocolosPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
-        <h1 className="font-serif text-3xl font-medium text-foreground">Protocolos Mestres</h1>
-        <p className="mt-1 text-muted-foreground">
-          Protocolos clínicos padronizados da clínica Esthetic Center.
-        </p>
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="font-serif text-3xl font-medium text-foreground">Protocolos Mestres</h1>
+          <p className="mt-1 text-muted-foreground">
+            Protocolos clínicos padronizados da clínica Esthetic Center.
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={openCreate}
+          className="shrink-0 focus-visible:ring-2 focus-visible:ring-marsala"
+        >
+          <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+          Novo protocolo
+        </Button>
       </header>
 
       {isError && (
@@ -101,8 +125,18 @@ export function ProtocolosPage() {
       <ProtocolDetailSheet
         protocol={selected}
         open={selected !== null}
+        onEdit={openEdit}
         onOpenChange={(open) => {
           if (!open) setSelected(null);
+        }}
+      />
+
+      <ProtocolFormSheet
+        protocol={editing}
+        open={formOpen}
+        onOpenChange={(open) => {
+          setFormOpen(open);
+          if (!open) setEditing(null);
         }}
       />
     </div>

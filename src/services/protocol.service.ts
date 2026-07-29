@@ -1,5 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  protocolFormSchema,
+  type ProtocolFormValues,
+} from "@/features/knowledge/types/protocol-form";
 
 /**
  * Protocol service — Central do Conhecimento / Protocolos Mestres
@@ -62,6 +66,8 @@ interface QueryResult {
   error: QueryError | null;
 }
 
+type ProtocolWritePayload = Record<string, string | null>;
+
 interface QueryBuilder extends PromiseLike<QueryResult> {
   select(columns: string, options?: { count?: "exact"; head?: boolean }): QueryBuilder;
   eq(column: string, value: string | number | boolean): QueryBuilder;
@@ -69,6 +75,8 @@ interface QueryBuilder extends PromiseLike<QueryResult> {
   order(column: string, options: { ascending: boolean }): QueryBuilder;
   range(from: number, to: number): QueryBuilder;
   limit(count: number): QueryBuilder;
+  insert(values: ProtocolWritePayload): QueryBuilder;
+  update(values: ProtocolWritePayload): QueryBuilder;
   maybeSingle(): PromiseLike<QueryResult>;
 }
 
@@ -226,4 +234,67 @@ export const getProtocolById = createServerFn({ method: "GET" })
     } catch {
       return null;
     }
+  });
+
+/* -------------------------------------------------------------------------- */
+/* Escrita                                                                     */
+/* -------------------------------------------------------------------------- */
+
+function toPayload(values: ProtocolFormValues): ProtocolWritePayload {
+  return {
+    name: values.name,
+    code: values.code.length > 0 ? values.code : null,
+    category: values.category.length > 0 ? values.category : null,
+    version: values.version.length > 0 ? values.version : null,
+    status: values.status,
+    summary: values.summary.length > 0 ? values.summary : null,
+    indications: values.indications.length > 0 ? values.indications : null,
+    contraindications: values.contraindications.length > 0 ? values.contraindications : null,
+  };
+}
+
+export const createProtocol = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown): ProtocolFormValues => protocolFormSchema.parse(input))
+  .handler(async ({ context, data }): Promise<Protocol> => {
+    const client = context.supabase as unknown as MinimalSupabaseClient;
+
+    const { data: row, error } = await client
+      .from(PROTOCOLS_TABLE)
+      .insert(toPayload(data))
+      .select("*")
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    const protocol = normalizeProtocol(row);
+    if (!protocol) throw new Error("Não foi possível criar o protocolo.");
+    return protocol;
+  });
+
+export const updateProtocol = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown): ProtocolFormValues & { id: string } => {
+    const record = (typeof input === "object" && input !== null ? input : {}) as Record<
+      string,
+      unknown
+    >;
+    const id = toStringOrNull(record.id);
+    if (!id) throw new Error("Identificador do protocolo é obrigatório.");
+    return { ...protocolFormSchema.parse(record), id };
+  })
+  .handler(async ({ context, data }): Promise<Protocol> => {
+    const client = context.supabase as unknown as MinimalSupabaseClient;
+    const { id, ...values } = data;
+
+    const { data: row, error } = await client
+      .from(PROTOCOLS_TABLE)
+      .update(toPayload(values))
+      .eq("id", id)
+      .select("*")
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    const protocol = normalizeProtocol(row);
+    if (!protocol) throw new Error("Não foi possível atualizar o protocolo.");
+    return protocol;
   });
