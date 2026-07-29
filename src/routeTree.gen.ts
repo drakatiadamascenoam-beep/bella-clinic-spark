@@ -17,7 +17,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedProfissionaisRouteImport } from './routes/_authenticated/profissionais'
 import { Route as AuthenticatedPacientesRouteImport } from './routes/_authenticated/pacientes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedConhecimentoRouteImport } from './routes/_authenticated/conhecimento'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedAtendimentosRouteImport } from './routes/_authenticated/atendimentos'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
@@ -69,12 +68,6 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedConhecimentoRoute =
-  AuthenticatedConhecimentoRouteImport.update({
-    id: '/conhecimento',
-    path: '/conhecimento',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedConfiguracoesRoute =
   AuthenticatedConfiguracoesRouteImport.update({
     id: '/configuracoes',
@@ -114,13 +107,13 @@ const AuthenticatedConhecimentoIndexRoute =
   AuthenticatedConhecimentoIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedConhecimentoRoute,
+    getParentRoute: () => AuthenticatedConhecimentoRouteRoute,
   } as any)
 const AuthenticatedConhecimentoProtocolosRoute =
   AuthenticatedConhecimentoProtocolosRouteImport.update({
     id: '/protocolos',
     path: '/protocolos',
-    getParentRoute: () => AuthenticatedConhecimentoRoute,
+    getParentRoute: () => AuthenticatedConhecimentoRouteRoute,
   } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
@@ -139,7 +132,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/conhecimento': typeof AuthenticatedConhecimentoRouteWithChildren
+  '/conhecimento': typeof AuthenticatedConhecimentoRouteRouteWithChildren
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/agenda': typeof AuthenticatedAgendaRoute
@@ -158,7 +151,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/conhecimento': typeof AuthenticatedConhecimentoIndexRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/agenda': typeof AuthenticatedAgendaRoute
@@ -170,6 +162,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/conhecimento/protocolos': typeof AuthenticatedConhecimentoProtocolosRoute
+  '/conhecimento': typeof AuthenticatedConhecimentoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -178,7 +171,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/conhecimento': typeof AuthenticatedConhecimentoRouteWithChildren
+  '/_authenticated/conhecimento': typeof AuthenticatedConhecimentoRouteRouteWithChildren
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
@@ -218,7 +211,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/reset-password'
-    | '/conhecimento'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/agenda'
@@ -230,6 +222,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/conhecimento/protocolos'
+    | '/conhecimento'
   id:
     | '__root__'
     | '/'
@@ -322,13 +315,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/conhecimento': {
-      id: '/_authenticated/conhecimento'
-      path: '/conhecimento'
-      fullPath: '/conhecimento'
-      preLoaderRoute: typeof AuthenticatedConhecimentoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/configuracoes': {
       id: '/_authenticated/configuracoes'
       path: '/configuracoes'
@@ -376,14 +362,14 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/conhecimento/'
       preLoaderRoute: typeof AuthenticatedConhecimentoIndexRouteImport
-      parentRoute: typeof AuthenticatedConhecimentoRoute
+      parentRoute: typeof AuthenticatedConhecimentoRouteRoute
     }
     '/_authenticated/conhecimento/protocolos': {
       id: '/_authenticated/conhecimento/protocolos'
       path: '/protocolos'
       fullPath: '/conhecimento/protocolos'
       preLoaderRoute: typeof AuthenticatedConhecimentoProtocolosRouteImport
-      parentRoute: typeof AuthenticatedConhecimentoRoute
+      parentRoute: typeof AuthenticatedConhecimentoRouteRoute
     }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
@@ -402,40 +388,39 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedConhecimentoRouteChildren {
+interface AuthenticatedConhecimentoRouteRouteChildren {
   AuthenticatedConhecimentoProtocolosRoute: typeof AuthenticatedConhecimentoProtocolosRoute
   AuthenticatedConhecimentoIndexRoute: typeof AuthenticatedConhecimentoIndexRoute
 }
 
-const AuthenticatedConhecimentoRouteChildren: AuthenticatedConhecimentoRouteChildren =
+const AuthenticatedConhecimentoRouteRouteChildren: AuthenticatedConhecimentoRouteRouteChildren =
   {
     AuthenticatedConhecimentoProtocolosRoute:
       AuthenticatedConhecimentoProtocolosRoute,
     AuthenticatedConhecimentoIndexRoute: AuthenticatedConhecimentoIndexRoute,
   }
 
-const AuthenticatedConhecimentoRouteWithChildren =
-  AuthenticatedConhecimentoRoute._addFileChildren(
-    AuthenticatedConhecimentoRouteChildren,
+const AuthenticatedConhecimentoRouteRouteWithChildren =
+  AuthenticatedConhecimentoRouteRoute._addFileChildren(
+    AuthenticatedConhecimentoRouteRouteChildren,
   )
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedConhecimentoRouteRoute: typeof AuthenticatedConhecimentoRouteRoute
+  AuthenticatedConhecimentoRouteRoute: typeof AuthenticatedConhecimentoRouteRouteWithChildren
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
   AuthenticatedAtendimentosRoute: typeof AuthenticatedAtendimentosRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
-  AuthenticatedConhecimentoRoute: typeof AuthenticatedConhecimentoRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPacientesRoute: typeof AuthenticatedPacientesRoute
   AuthenticatedProfissionaisRoute: typeof AuthenticatedProfissionaisRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedConhecimentoRouteRoute: AuthenticatedConhecimentoRouteRoute,
+  AuthenticatedConhecimentoRouteRoute:
+    AuthenticatedConhecimentoRouteRouteWithChildren,
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
   AuthenticatedAtendimentosRoute: AuthenticatedAtendimentosRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
-  AuthenticatedConhecimentoRoute: AuthenticatedConhecimentoRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPacientesRoute: AuthenticatedPacientesRoute,
   AuthenticatedProfissionaisRoute: AuthenticatedProfissionaisRoute,
