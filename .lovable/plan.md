@@ -1,37 +1,33 @@
-## Sprint 1.1 — Consolidação Arquitetural
+## Situação atual (verificada)
 
-Criação apenas de documentação e scaffolding. Nenhum arquivo existente é movido, alterado ou removido; nenhuma mudança em banco, tipos ou conexões.
+Boa parte da Sprint 1.1 já está no repositório:
 
-### 1. Governança técnica — `/docs/adr` (raiz, fora de `/src`)
+- `/docs/adr` existe na raiz com ADR-001, ADR-002, ADR-003, ADR-004 e um `README.md` de índice — todos com Contexto, Decisão, Justificativa e Consequências.
+- `/src/features` existe com os 7 domínios (`knowledge`, `patients`, `attendance`, `professionals`, `agenda`, `dashboard`, `settings`), cada um com `components/`, `hooks/`, `services/`, `pages/`, `types/` e `README.md`.
 
-Quatro ADRs em Markdown, cada um com as seções **Contexto**, **Decisão**, **Justificativa** e **Consequências**:
+O que **falta** para fechar o escopo desta sprint é o item 3: as **Regras Arquiteturais** ainda não estão formalizadas em um documento próprio.
 
-- `docs/adr/ADR-001-database-first.md` — Supabase como Single Source of Truth; congelamento do Bella Knowledge Graph v3.0; proibição de mocks e de alterações de schema pelo frontend.
-- `docs/adr/ADR-002-authentication.md` — autenticação corporativa (credenciais emitidas pela administração), remoção do cadastro público, recuperação de senha, rotas protegidas pelo layout `_authenticated`.
-- `docs/adr/ADR-003-dashboard.md` — métricas unificadas por custom hooks (`useDashboard`) sobre a camada de serviços; UI desacoplada (KpiCard, tabela, skeleton, empty state) sem acesso direto ao backend.
-- `docs/adr/ADR-004-feature-based-architecture.md` — organização por domínios em `/src/features`; fronteira entre features e `/src/components/shared`, `/src/services`, `/src/routes`.
+## O que será feito
 
-Também adiciono `docs/adr/README.md` como índice curto dos ADRs (opcional, ajuda navegação).
+### 1. ADR-005 — Regras Arquiteturais (`docs/adr/ADR-005-architectural-rules.md`)
+Documento normativo com Contexto, Decisão, Justificativa e Consequências, formalizando:
+- `src/components/**` contém apenas componentes compartilhados e agnósticos de domínio.
+- `src/features/**` contém todo código específico de negócio.
+- Nenhum componente React acessa Supabase diretamente.
+- Fluxo obrigatório: **UI → Hooks → Services → Supabase**.
+- Database First; Supabase como Single Source of Truth.
+- TypeScript strict; `any` proibido; dados mockados proibidos.
+- Exceção explícita e única já existente: o `AuthProvider` e o gate de rota autenticada consomem a sessão do cliente de auth diretamente (comportamento homologado, fora de escopo de alteração).
 
-### 2. Scaffolding de domínios — `/src/features`
+### 2. Atualização do índice
+`docs/adr/README.md` passa a listar o ADR-005.
 
-Sete domínios, cada um com as subpastas `components`, `hooks`, `services`, `pages`, `types` e um `README.md` descrevendo a responsabilidade do domínio, o que pertence e o que não pertence a ele:
+### 3. Relatório final
+- Lista de arquivos criados e alterados.
+- Árvore final de `/docs/adr` e `/src/features`.
+- Build de produção sem erros.
+- Verificação de não-regressão das telas da Sprint 1 (landing, `/auth`, dashboard e rotas de módulo) via navegação automatizada.
+- Seção "Melhorias identificadas (não implementadas)" — apenas documentadas, ex.: regra de lint para barrar import de Supabase em componentes, e migração incremental de `src/services` para os domínios.
 
-```text
-src/features/
-  knowledge/      { components, hooks, services, pages, types } + README.md
-  patients/       ...
-  attendance/     ...
-  professionals/  ...
-  agenda/         ...
-  dashboard/      ...
-  settings/       ...
-```
-
-Detalhe técnico: Git não versiona pastas vazias, então cada subpasta recebe um `.gitkeep` para que a estrutura persista. Nenhum arquivo `.ts`/`.tsx` é criado — assim nada entra no grafo de build nem em `routeTree.gen.ts`.
-
-### 3. Validação
-
-Build de produção executado ao final para confirmar ausência de erros (esperado: nenhum impacto, já que nada executável foi adicionado).
-
-Sprint 2 não é iniciada; aguardo aprovação no Gate.
+## Restrições respeitadas
+Nenhum arquivo existente é movido; nenhuma tela homologada, autenticação, schema, conexão ou tabela é alterada; Sprint 2 não é iniciada. As únicas escritas são os dois arquivos de documentação acima.

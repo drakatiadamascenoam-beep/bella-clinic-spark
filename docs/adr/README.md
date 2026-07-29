@@ -9,6 +9,7 @@ Registro das decisões arquiteturais do projeto. Cada ADR segue as seções
 | [ADR-002](./ADR-002-authentication.md) | Autenticação corporativa e remoção do cadastro público | Aceito |
 | [ADR-003](./ADR-003-dashboard.md) | Métricas unificadas via Custom Hooks e desacoplamento da UI | Aceito |
 | [ADR-004](./ADR-004-feature-based-architecture.md) | Arquitetura orientada a domínios (`/src/features`) | Aceito |
+| [ADR-005](./ADR-005-architectural-rules.md) | Regras arquiteturais congeladas (camadas, dados, tipagem) | Aceito |
 
 Novas decisões relevantes devem gerar um novo ADR numerado sequencialmente.
 ADRs existentes não são reescritos: quando superados, mudam de status e
