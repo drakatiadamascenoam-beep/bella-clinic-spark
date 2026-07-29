@@ -1,5 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "@/components/shared/page-placeholder";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/conhecimento")({
   head: () => ({
@@ -12,5 +11,5 @@ export const Route = createFileRoute("/_authenticated/conhecimento")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => <PagePlaceholder url="/conhecimento" />,
+  component: () => <Outlet />,
 });

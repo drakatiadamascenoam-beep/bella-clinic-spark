@@ -1,33 +1,34 @@
-## Situação atual (verificada)
+## Sprint 2 — Central do Conhecimento → Protocolos Mestres
 
-Boa parte da Sprint 1.1 já está no repositório:
+Atividades de MCP/OAuth/infra ficam encerradas. Esta sprint entrega apenas a listagem de Protocolos Mestres, seguindo o fluxo obrigatório UI → useProtocol() → protocol.service.ts → Supabase.
 
-- `/docs/adr` existe na raiz com ADR-001, ADR-002, ADR-003, ADR-004 e um `README.md` de índice — todos com Contexto, Decisão, Justificativa e Consequências.
-- `/src/features` existe com os 7 domínios (`knowledge`, `patients`, `attendance`, `professionals`, `agenda`, `dashboard`, `settings`), cada um com `components/`, `hooks/`, `services/`, `pages/`, `types/` e `README.md`.
+### Observação verificada sobre os dados
+Consultei o schema `public` do backend agora: ele continua **sem nenhuma tabela** (nenhuma linha em `information_schema.columns`). Ou seja, a tabela de protocolos do Bella Knowledge Graph v3.0 ainda não está aplicada nesta instância. Como não posso modificar schema nem usar mocks, o serviço será escrito contra o contrato esperado (`protocols`) e, enquanto a fonte não existir, a tela exibirá o Empty State / "Fonte indisponível" — exatamente o comportamento já homologado no Dashboard. Assim que o schema for aplicado, a tela passa a listar dados reais sem alteração de código.
 
-O que **falta** para fechar o escopo desta sprint é o item 3: as **Regras Arquiteturais** ainda não estão formalizadas em um documento próprio.
+### Arquivos a criar
+1. `src/services/protocol.service.ts` — server functions autenticadas (`requireSupabaseAuth`, RLS do usuário), no mesmo padrão de `dashboard.service.ts`:
+   - `listProtocols({ search, status, category, page })` → `{ items, total, sourceUnavailable }`
+   - `getProtocolById(id)` → detalhe completo ou `null`
+   - Normalizadores tipados (sem `any`), tolerantes a ausência da fonte.
+2. `src/hooks/useProtocol.ts` — TanStack Query: `useProtocols(filters)` e `useProtocol(id)`, únicas portas de entrada de dados da tela.
+3. `src/features/knowledge/components/ProtocolStatusBadge.tsx` — badge de status (ativo, rascunho, arquivado) com tokens do Design System atual.
+4. `src/features/knowledge/components/ProtocolFilters.tsx` — busca textual, filtro de status e de categoria (estado controlado pela página).
+5. `src/features/knowledge/components/ProtocolTable.tsx` — tabela com Skeleton Loading, Empty State e clique na linha abrindo o detalhe.
+6. `src/features/knowledge/components/ProtocolDetailSheet.tsx` — Sheet lateral com os dados do protocolo selecionado.
+7. `src/features/knowledge/pages/ProtocolosPage.tsx` — composição da página (cabeçalho, filtros, tabela, sheet).
+8. `src/routes/_authenticated/conhecimento/protocolos.tsx` — rota `/conhecimento/protocolos` com `head()` próprio, renderizando `ProtocolosPage`.
 
-## O que será feito
+### Arquivos a alterar
+- `src/routes/_authenticated/conhecimento.tsx` → passa a ser layout (`<Outlet />`), com o conteúdo atual movido para `src/routes/_authenticated/conhecimento/index.tsx`. Essa divisão é exigida pelo roteador para que exista uma rota filha `/conhecimento/protocolos`; nenhum conteúdo homologado é perdido.
+- `src/routes/_authenticated/conhecimento/index.tsx` (novo) → mantém o placeholder atual e ganha um card de acesso a "Protocolos Mestres".
+- `src/config/navigation.config.ts` → acrescenta `/conhecimento/protocolos` ao tipo de URL e ao breadcrumb (sem mudar a estrutura da Sidebar).
 
-### 1. ADR-005 — Regras Arquiteturais (`docs/adr/ADR-005-architectural-rules.md`)
-Documento normativo com Contexto, Decisão, Justificativa e Consequências, formalizando:
-- `src/components/**` contém apenas componentes compartilhados e agnósticos de domínio.
-- `src/features/**` contém todo código específico de negócio.
-- Nenhum componente React acessa Supabase diretamente.
-- Fluxo obrigatório: **UI → Hooks → Services → Supabase**.
-- Database First; Supabase como Single Source of Truth.
-- TypeScript strict; `any` proibido; dados mockados proibidos.
-- Exceção explícita e única já existente: o `AuthProvider` e o gate de rota autenticada consomem a sessão do cliente de auth diretamente (comportamento homologado, fora de escopo de alteração).
+### Detalhes técnicos
+- TypeScript estrito, sem `any`; interfaces exportadas para `Protocol`, `ProtocolStatus` e filtros.
+- Nenhum componente acessa Supabase diretamente; toda leitura passa pelo hook → service.
+- Filtros e paginação aplicados no servidor (`ilike`, `eq`, `range`), evitando filtragem no cliente.
+- Reuso exclusivo de componentes shadcn já instalados (table, sheet, badge, input, select, skeleton) — nenhuma dependência nova.
+- Não serão tocados: autenticação, `src/lib/mcp/*`, rotas OAuth, `vite.config.ts`, `package.json`, schema do banco.
 
-### 2. Atualização do índice
-`docs/adr/README.md` passa a listar o ADR-005.
-
-### 3. Relatório final
-- Lista de arquivos criados e alterados.
-- Árvore final de `/docs/adr` e `/src/features`.
-- Build de produção sem erros.
-- Verificação de não-regressão das telas da Sprint 1 (landing, `/auth`, dashboard e rotas de módulo) via navegação automatizada.
-- Seção "Melhorias identificadas (não implementadas)" — apenas documentadas, ex.: regra de lint para barrar import de Supabase em componentes, e migração incremental de `src/services` para os domínios.
-
-## Restrições respeitadas
-Nenhum arquivo existente é movido; nenhuma tela homologada, autenticação, schema, conexão ou tabela é alterada; Sprint 2 não é iniciada. As únicas escritas são os dois arquivos de documentação acima.
+### Entrega final
+Ao concluir: lista de arquivos criados, lista de arquivos alterados, resultado do build de produção, resultado do typecheck e verificação de não-regressão das telas já homologadas (login, dashboard e demais módulos) via navegação automatizada.
