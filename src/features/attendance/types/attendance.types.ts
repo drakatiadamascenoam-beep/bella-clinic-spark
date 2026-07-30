@@ -39,6 +39,16 @@ export interface AttendanceListResult {
 
 export type AttendanceUpdateInput = AttendanceFormData & { id: string };
 
+/**
+ * Contexto opcional recebido de outros módulos (ex.: Agenda) para
+ * pré-preencher a abertura de uma sessão. Não cria nada por si só.
+ */
+export interface AttendancePrefill {
+  pacienteId: string | null;
+  protocoloId: string | null;
+  dataAtendimento: string | null;
+}
+
 export interface AttendanceStatusChangeInput {
   id: string;
   status: AttendanceStatus;

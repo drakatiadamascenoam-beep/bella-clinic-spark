@@ -22,7 +22,7 @@ import {
   useCreateAtendimento,
   useUpdateAtendimento,
 } from "../hooks/useAttendance";
-import type { Attendance } from "../types/attendance.types";
+import type { Attendance, AttendancePrefill } from "../types/attendance.types";
 import {
   attendanceFormDefaults,
   attendanceSchema,
@@ -36,6 +36,8 @@ export interface AttendanceFormSheetProps {
   attendance: Attendance | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Contexto opcional (ex.: Agenda) aplicado apenas na abertura de sessão. */
+  prefill?: AttendancePrefill | null;
 }
 
 function toFormValues(attendance: Attendance): AttendanceFormData {
@@ -46,6 +48,15 @@ function toFormValues(attendance: Attendance): AttendanceFormData {
     queixa_principal: attendance.queixaPrincipal ?? "",
     evolucao_clinica: attendance.evolucaoClinica ?? "",
     observacoes_prescricoes: attendance.observacoesPrescricoes ?? "",
+  };
+}
+
+function fromPrefill(prefill: AttendancePrefill): AttendanceFormData {
+  return {
+    ...attendanceFormDefaults(),
+    paciente_id: prefill.pacienteId ?? "",
+    protocolo_id: prefill.protocoloId ?? "",
+    data_atendimento: toDateTimeLocalValue(prefill.dataAtendimento),
   };
 }
 
