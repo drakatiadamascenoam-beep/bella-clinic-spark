@@ -87,6 +87,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@estheticcenter" },
+      { name: "twitter:title", content: "Bella IA — Esthetic Center" },
+      { name: "twitter:description", content: "Plataforma corporativa da Esthetic Center." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3b6efb5c-3053-4ce2-bd2f-709bfe1eda52/id-preview-47e8557c--416e99e4-c65a-4d07-887d-6dae5bd11599.lovable.app-1785423500785.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3b6efb5c-3053-4ce2-bd2f-709bfe1eda52/id-preview-47e8557c--416e99e4-c65a-4d07-887d-6dae5bd11599.lovable.app-1785423500785.png" },
     ],
     links: [
       {
