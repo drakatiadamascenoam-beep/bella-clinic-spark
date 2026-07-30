@@ -22,7 +22,7 @@ import {
   useCreateAtendimento,
   useUpdateAtendimento,
 } from "../hooks/useAttendance";
-import type { Attendance } from "../types/attendance.types";
+import type { Attendance, AttendancePrefill } from "../types/attendance.types";
 import {
   attendanceFormDefaults,
   attendanceSchema,
@@ -36,6 +36,8 @@ export interface AttendanceFormSheetProps {
   attendance: Attendance | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Contexto opcional (ex.: Agenda) aplicado apenas na abertura de sessão. */
+  prefill?: AttendancePrefill | null;
 }
 
 function toFormValues(attendance: Attendance): AttendanceFormData {
@@ -49,10 +51,20 @@ function toFormValues(attendance: Attendance): AttendanceFormData {
   };
 }
 
+function fromPrefill(prefill: AttendancePrefill): AttendanceFormData {
+  return {
+    ...attendanceFormDefaults(),
+    paciente_id: prefill.pacienteId ?? "",
+    protocolo_id: prefill.protocoloId ?? "",
+    data_atendimento: toDateTimeLocalValue(prefill.dataAtendimento),
+  };
+}
+
 export function AttendanceFormSheet({
   attendance,
   open,
   onOpenChange,
+  prefill = null,
 }: AttendanceFormSheetProps) {
   const isEdit = attendance !== null;
   const { data: loaded, isFetching } = useAtendimento(
@@ -73,8 +85,12 @@ export function AttendanceFormSheet({
   const { reset } = form;
   useEffect(() => {
     if (!open) return;
-    reset(current ? toFormValues(current) : attendanceFormDefaults());
-  }, [open, current, reset]);
+    if (current) {
+      reset(toFormValues(current));
+      return;
+    }
+    reset(prefill ? fromPrefill(prefill) : attendanceFormDefaults());
+  }, [open, current, prefill, reset]);
 
   const isDirty = form.formState.isDirty;
   const showSkeleton = isEdit && isFetching && !loaded;
