@@ -1,34 +1,51 @@
-## Sprint 2 — Central do Conhecimento → Protocolos Mestres
+## Diagnóstico prévio (verificado agora)
 
-Atividades de MCP/OAuth/infra ficam encerradas. Esta sprint entrega apenas a listagem de Protocolos Mestres, seguindo o fluxo obrigatório UI → useProtocol() → protocol.service.ts → Supabase.
+- `src/integrations/supabase/types.ts` expõe `public.Tables = never` — o schema gerado continua **vazio**. Não há `agendamentos`, `agenda`, `compromissos` nem `appointments`.
+- Consequência: mesma estratégia validada nas Sprints 5 e 6 — mapper tolerante a aliases físicos, serviço defensivo e estado explícito **"Fonte de dados indisponível (Aguardando BKG v3.0)"**. Nenhuma persistência simulada, nenhum mock.
+- `src/features/agenda/` existe apenas como scaffold vazio (README + `.gitkeep`). Como a Sprint pede `/src/features/schedule`, o scaffold `agenda` será removido para não gerar código morto/duplicidade de domínio.
+- `src/routes/_authenticated/agenda.tsx` hoje renderiza `PagePlaceholder` — será apontado para `AgendaPage`.
 
-### Observação verificada sobre os dados
-Consultei o schema `public` do backend agora: ele continua **sem nenhuma tabela** (nenhuma linha em `information_schema.columns`). Ou seja, a tabela de protocolos do Bella Knowledge Graph v3.0 ainda não está aplicada nesta instância. Como não posso modificar schema nem usar mocks, o serviço será escrito contra o contrato esperado (`protocols`) e, enquanto a fonte não existir, a tela exibirá o Empty State / "Fonte indisponível" — exatamente o comportamento já homologado no Dashboard. Assim que o schema for aplicado, a tela passa a listar dados reais sem alteração de código.
+## O que será construído
 
-### Arquivos a criar
-1. `src/services/protocol.service.ts` — server functions autenticadas (`requireSupabaseAuth`, RLS do usuário), no mesmo padrão de `dashboard.service.ts`:
-   - `listProtocols({ search, status, category, page })` → `{ items, total, sourceUnavailable }`
-   - `getProtocolById(id)` → detalhe completo ou `null`
-   - Normalizadores tipados (sem `any`), tolerantes a ausência da fonte.
-2. `src/hooks/useProtocol.ts` — TanStack Query: `useProtocols(filters)` e `useProtocol(id)`, únicas portas de entrada de dados da tela.
-3. `src/features/knowledge/components/ProtocolStatusBadge.tsx` — badge de status (ativo, rascunho, arquivado) com tokens do Design System atual.
-4. `src/features/knowledge/components/ProtocolFilters.tsx` — busca textual, filtro de status e de categoria (estado controlado pela página).
-5. `src/features/knowledge/components/ProtocolTable.tsx` — tabela com Skeleton Loading, Empty State e clique na linha abrindo o detalhe.
-6. `src/features/knowledge/components/ProtocolDetailSheet.tsx` — Sheet lateral com os dados do protocolo selecionado.
-7. `src/features/knowledge/pages/ProtocolosPage.tsx` — composição da página (cabeçalho, filtros, tabela, sheet).
-8. `src/routes/_authenticated/conhecimento/protocolos.tsx` — rota `/conhecimento/protocolos` com `head()` próprio, renderizando `ProtocolosPage`.
+### 1. Domínio puro — `src/features/schedule/domain/`
+- `schedule-status.ts`: `SCHEDULE_STATUS` (AGENDADO, CONFIRMADO, EM_ATENDIMENTO, CONCLUIDO, CANCELADO, FALTA), labels, normalização determinística de valores desconhecidos.
+- `schedule-flow.ts`: máquina de estados exatamente conforme especificado, com `canTransition`, `availableTransitions`, `applyTransition` (erro determinístico em transição inválida) e estados terminais (CONCLUIDO, CANCELADO, FALTA).
+- `schedule-conflict.ts`: cálculo de intervalo (início + duração), duração mínima/máxima (15–240 min), detecção de sobreposição contra a lista de compromissos do dia, ignorando cancelados/faltas, e mensagens explicativas de conflito.
 
-### Arquivos a alterar
-- `src/routes/_authenticated/conhecimento.tsx` → passa a ser layout (`<Outlet />`), com o conteúdo atual movido para `src/routes/_authenticated/conhecimento/index.tsx`. Essa divisão é exigida pelo roteador para que exista uma rota filha `/conhecimento/protocolos`; nenhum conteúdo homologado é perdido.
-- `src/routes/_authenticated/conhecimento/index.tsx` (novo) → mantém o placeholder atual e ganha um card de acesso a "Protocolos Mestres".
-- `src/config/navigation.config.ts` → acrescenta `/conhecimento/protocolos` ao tipo de URL e ao breadcrumb (sem mudar a estrutura da Sidebar).
+Sem React, sem TanStack Query, sem Supabase.
 
-### Detalhes técnicos
-- TypeScript estrito, sem `any`; interfaces exportadas para `Protocol`, `ProtocolStatus` e filtros.
-- Nenhum componente acessa Supabase diretamente; toda leitura passa pelo hook → service.
-- Filtros e paginação aplicados no servidor (`ilike`, `eq`, `range`), evitando filtragem no cliente.
-- Reuso exclusivo de componentes shadcn já instalados (table, sheet, badge, input, select, skeleton) — nenhuma dependência nova.
-- Não serão tocados: autenticação, `src/lib/mcp/*`, rotas OAuth, `vite.config.ts`, `package.json`, schema do banco.
+### 2. Contratos, Zod e mapper
+- `types/schedule-form.types.ts`: schema Zod (`paciente_id` obrigatório, `protocolo_id` opcional, `profissional_id` opcional — enviado apenas se existir no schema físico, `data_hora_inicio` obrigatório, `duracao_minutos` com padrão 60 e presets 30/60, `observacoes` opcional) + defaults.
+- `types/schedule.types.ts`: modelo de domínio `Appointment` (camelCase), filtros (data, status), `ScheduleListResult` com `sourceUnavailable`.
+- `mappers/schedule.mapper.ts`: tradução única entre colunas físicas (com aliases) e o contrato; `SCHEDULE_TABLE`, parsers de input, payload de escrita, lista vazia.
 
-### Entrega final
-Ao concluir: lista de arquivos criados, lista de arquivos alterados, resultado do build de produção, resultado do typecheck e verificação de não-regressão das telas já homologadas (login, dashboard e demais módulos) via navegação automatizada.
+### 3. Serviço e hooks
+- `services/schedule.service.ts`: server functions (`getAgendamentos`, `getAgendamentoById`, `createAgendamento`, `updateAgendamentoStatus`) com `requireSupabaseAuth`, wrapper fino, orquestrando mapper + domínio (validação de conflito no servidor antes de inserir; transição validada por `schedule-flow`). Leitura falha → `sourceUnavailable: true`; escrita falha → erro explícito.
+- `hooks/useSchedule.ts`: `useAgendamentos`, `useAgendamento`, `useCreateAgendamento`, `useUpdateAgendamentoStatus`, com invalidação da chave `agendamentos`.
+
+### 4. UI — `src/features/schedule/components/`
+- `ScheduleView.tsx`: alterna Lista/Tabela do dia e Timeline por faixa horária (componente de apresentação puro).
+- `ScheduleFilters.tsx`: Hoje / Amanhã / seletor de data (Popover + Calendar shadcn) e filtro por status.
+- `ScheduleFormSheet.tsx` + `ScheduleFormFields.tsx` + `ScheduleSelectors.tsx`: drawer de novo agendamento, seletores defensivos reutilizando `usePacientes` e `useProtocols`, data/hora, duração, Skeleton, Spinner, Dirty State e Anti-Double Submit. Conflito detectado → bloqueia o envio, destaca o campo de horário, exibe alerta amigável e **preserva os dados preenchidos**.
+- `ScheduleDetailSheet.tsx`: detalhes, transições de status válidas e ação **"Iniciar Atendimento"** que apenas encaminha contexto (paciente, protocolo, data) — nenhuma criação automática; a sessão só nasce após o usuário confirmar no formulário de Atendimento.
+- `ScheduleStatusBadge.tsx` e `schedule-format.ts` para consistência visual com as Sprints 2–6.
+
+### 5. Página e rota
+- `pages/AgendaPage.tsx`: título "Agenda Clínica", botão "Novo Agendamento", Skeleton, Empty State elegante, Error State com Retry — dentro do `AppShell` já existente.
+- `src/routes/_authenticated/agenda.tsx`: passa a renderizar `AgendaPage` (head/SEO da rota preservado e refinado).
+
+## Ponto técnico que exige sua ciência
+
+O "Iniciar Atendimento" precisa **pré-preencher** o formulário de Atendimento. Hoje `AttendanceFormSheet` aceita apenas `attendance: Attendance | null`, sem entrada de valores iniciais. Para respeitar a regra de consumir só contratos públicos, farei:
+
+- Criação de `src/features/attendance/index.ts` (barrel público) exportando `AttendanceFormSheet`, tipos e um novo tipo `AttendancePrefill`.
+- Uma alteração **aditiva e retrocompatível** em `AttendanceFormSheet`: prop opcional `prefill?: AttendancePrefill`, usada apenas na abertura em modo criação. Nenhum comportamento atual muda.
+
+Essas são as duas únicas modificações fora de `/src/features/schedule` além do registro da rota. Se preferir, posso em vez disso duplicar um formulário próprio na Agenda — mas isso geraria código redundante e divergência de validação clínica, então recomendo a via aditiva acima.
+
+## Qualidade e validação
+
+- Zero `any`, tipagem estrita, arquivos abaixo de ~300 linhas, componentes sem import de Supabase/Domain/Mapper.
+- Build + `tsgo --noEmit` limpos.
+- Verificação por varredura (`rg`) do checklist arquitetural e teste de fluxo integrado no preview via Playwright (Agenda → Detalhe → Iniciar Atendimento → formulário pré-preenchido sem gravação automática).
+- Regressão das Sprints 1 a 6 checada nas rotas existentes.
