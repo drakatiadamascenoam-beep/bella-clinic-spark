@@ -64,6 +64,7 @@ export function AttendanceFormSheet({
   attendance,
   open,
   onOpenChange,
+  prefill = null,
 }: AttendanceFormSheetProps) {
   const isEdit = attendance !== null;
   const { data: loaded, isFetching } = useAtendimento(
@@ -84,8 +85,12 @@ export function AttendanceFormSheet({
   const { reset } = form;
   useEffect(() => {
     if (!open) return;
-    reset(current ? toFormValues(current) : attendanceFormDefaults());
-  }, [open, current, reset]);
+    if (current) {
+      reset(toFormValues(current));
+      return;
+    }
+    reset(prefill ? fromPrefill(prefill) : attendanceFormDefaults());
+  }, [open, current, prefill, reset]);
 
   const isDirty = form.formState.isDirty;
   const showSkeleton = isEdit && isFetching && !loaded;
