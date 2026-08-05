@@ -137,7 +137,7 @@ export const updateProfissional = createServerFn({ method: "POST" })
     >;
     const id = toStringOrNull(record.id);
     if (!id) throw new Error("Identificador do profissional é obrigatório.");
-    const values = professionalSchema.partial().parse({ ...record, id: undefined });
+    const values = professionalSchema.parse({ ...record, id: undefined });
     return { ...values, id };
   })
   .handler(async ({ context, data }): Promise<Professional> => {
