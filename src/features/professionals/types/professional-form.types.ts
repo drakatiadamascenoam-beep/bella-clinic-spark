@@ -46,7 +46,7 @@ export const professionalSchema = z
     horario_fim: timeSchema,
     intervalo_inicio: optionalTimeSchema,
     intervalo_fim: optionalTimeSchema,
-    ativo: z.boolean().default(true),
+    ativo: z.boolean(),
   })
   .superRefine((values, ctx) => {
     const scheduleValidation = validateWorkSchedule({
