@@ -1,0 +1,27 @@
+import { Badge } from "@/components/ui/badge";
+import type { AIProviderStatus } from "../types/ai.types";
+
+export interface AIStatusBadgeProps {
+  status: AIProviderStatus | null;
+  mode: "LLM" | "LOCAL_RULES";
+  isLoading?: boolean;
+}
+
+/** Badge de observabilidade: status, provider, modelo, versão, modo e última verificação. */
+export function AIStatusBadge({ status, mode, isLoading = false }: AIStatusBadgeProps) {
+  const dot = isLoading ? "🟡" : status?.available ? "🟢" : "🔴";
+  const checked = status ? new Date(status.lastCheckedAt).toLocaleTimeString("pt-BR") : "—";
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-soft">
+      <span aria-hidden="true">{dot}</span>
+      <span className="text-sm font-medium text-foreground">{status?.name ?? "Indisponível"}</span>
+      <Badge variant="secondary">{status?.model ?? "—"}</Badge>
+      <Badge variant="outline">v{status?.providerVersion ?? "—"}</Badge>
+      <Badge variant={mode === "LLM" ? "default" : "secondary"}>
+        {mode === "LLM" ? "LLM" : "Regras locais"}
+      </Badge>
+      <span className="text-xs text-muted-foreground">Última verificação: {checked}</span>
+    </div>
+  );
+}
