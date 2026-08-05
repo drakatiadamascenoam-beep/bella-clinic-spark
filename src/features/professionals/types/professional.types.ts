@@ -52,4 +52,4 @@ export interface ProfessionalListResult {
   sourceUnavailable: boolean;
 }
 
-export type ProfessionalUpdateInput = Partial<ProfessionalFormData> & { id: string };
+export type ProfessionalUpdateInput = ProfessionalFormData & { id: string };
