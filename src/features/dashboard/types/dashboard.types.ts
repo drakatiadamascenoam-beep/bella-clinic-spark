@@ -81,3 +81,5 @@ export interface DashboardSnapshot {
 
 export type { DashboardInsight, DashboardInsightSeverity } from "../domain/dashboard-insights";
 export type { DashboardPeriod, DateRange } from "../domain/dashboard-filters";
+/** Rótulos de período expostos à UI (evita import de domínio nos componentes). */
+export { DASHBOARD_PERIOD_LABELS } from "../domain/dashboard-filters";
