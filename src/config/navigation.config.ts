@@ -4,6 +4,7 @@ import {
   Users,
   Stethoscope,
   CalendarDays,
+  BrainCircuit,
   UserCog,
   Settings,
   type LucideIcon,
@@ -19,6 +20,7 @@ export interface NavItem {
     | "/pacientes"
     | "/atendimentos"
     | "/agenda"
+    | "/intelligence"
     | "/profissionais"
     | "/configuracoes";
   icon: LucideIcon;
@@ -64,6 +66,12 @@ export const navigationConfig: NavGroup[] = [
         url: "/agenda",
         icon: CalendarDays,
         description: "Agendamentos e disponibilidade.",
+      },
+      {
+        title: "Bella Intelligence",
+        url: "/intelligence",
+        icon: BrainCircuit,
+        description: "Apoio à decisão clínica e insights operacionais.",
       },
     ],
   },

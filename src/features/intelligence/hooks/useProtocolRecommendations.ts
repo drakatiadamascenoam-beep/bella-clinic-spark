@@ -4,7 +4,8 @@ import { recommendProtocols } from "../services/ai-orchestrator.service";
 import type { MasterProtocol } from "../domain/ai-clinical-engine";
 import type { AIExecutionResult, ClinicalRecommendation } from "../types/ai.types";
 
-interface RecommendProtocolsInput {
+/** Entrada da recomendação determinística de protocolos-mestre. */
+export interface RecommendProtocolsInput {
   readonly history: readonly string[];
   readonly complaint: string;
   readonly protocols: readonly MasterProtocol[];

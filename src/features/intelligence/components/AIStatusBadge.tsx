@@ -9,12 +9,13 @@ export interface AIStatusBadgeProps {
 
 /** Badge de observabilidade: status, provider, modelo, versão, modo e última verificação. */
 export function AIStatusBadge({ status, mode, isLoading = false }: AIStatusBadgeProps) {
-  const dot = isLoading ? "🟡" : status?.available ? "🟢" : "🔴";
+  const tone = isLoading ? "bg-muted-foreground" : status?.available ? "bg-emerald-600" : "bg-destructive";
+  const toneLabel = isLoading ? "Verificando" : status?.available ? "Disponível" : "Indisponível";
   const checked = status ? new Date(status.lastCheckedAt).toLocaleTimeString("pt-BR") : "—";
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-soft">
-      <span aria-hidden="true">{dot}</span>
+      <span className={`h-2 w-2 rounded-full ${tone}`} role="img" aria-label={toneLabel} />
       <span className="text-sm font-medium text-foreground">{status?.name ?? "Indisponível"}</span>
       <Badge variant="secondary">{status?.model ?? "—"}</Badge>
       <Badge variant="outline">v{status?.providerVersion ?? "—"}</Badge>
