@@ -1,10 +1,7 @@
 import { RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  DASHBOARD_PERIOD_LABELS,
-  type DashboardPeriod,
-} from "../domain/dashboard-filters";
+import { DASHBOARD_PERIOD_LABELS, type DashboardPeriod } from "../types/dashboard.types";
 
 const SELECTABLE: DashboardPeriod[] = ["today", "week", "month", "last30", "last90", "year"];
 
