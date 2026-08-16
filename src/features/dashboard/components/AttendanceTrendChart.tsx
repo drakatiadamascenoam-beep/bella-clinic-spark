@@ -35,17 +35,17 @@ export function AttendanceTrendChart({
           <AreaChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
             <defs>
               <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="hsl(var(--marsala))" stopOpacity={0.28} />
-                <stop offset="100%" stopColor="hsl(var(--marsala))" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="var(--marsala)" stopOpacity={0.28} />
+                <stop offset="100%" stopColor="var(--marsala)" stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="label"
               tickLine={false}
               axisLine={false}
               fontSize={11}
-              stroke="hsl(var(--muted-foreground))"
+              stroke="var(--muted-foreground)"
               minTickGap={16}
             />
             <YAxis
@@ -53,22 +53,22 @@ export function AttendanceTrendChart({
               axisLine={false}
               fontSize={11}
               allowDecimals={false}
-              stroke="hsl(var(--muted-foreground))"
+              stroke="var(--muted-foreground)"
             />
             <Tooltip
               contentStyle={{
                 borderRadius: 12,
-                border: "1px solid hsl(var(--border))",
-                background: "hsl(var(--card))",
+                border: "1px solid var(--border)",
+                background: "var(--card)",
                 fontSize: 12,
               }}
-              labelStyle={{ color: "hsl(var(--muted-foreground))" }}
+              labelStyle={{ color: "var(--muted-foreground)" }}
               formatter={(value: number) => [`${value}`, "Atendimentos"]}
             />
             <Area
               type="monotone"
               dataKey="value"
-              stroke="hsl(var(--marsala))"
+              stroke="var(--marsala)"
               strokeWidth={2}
               fill="url(#trendFill)"
             />
